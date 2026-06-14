@@ -860,14 +860,17 @@ function toast(msg,type='info'){
   setTimeout(()=>t.classList.remove('show'),3200);
 }
 function saveConfig(){
-  const id=document.getElementById('cfg-sheet-id').value.trim();
-  if(!id){toast('Please enter a Spreadsheet ID','error');return;}
-  SHEET_ID=id;localStorage.setItem('art_sheet_id',id);loadFromSheets();
+  const pubId=(document.getElementById('cfg-pub-id')||{}).value?.trim()||'';
+  const sheetId=(document.getElementById('cfg-sheet-id')||{}).value?.trim()||'';
+  if(!pubId&&!sheetId){toast('Paste your Published URL ID first','error');return;}
+  PUB_ID=pubId;localStorage.setItem('art_pub_id',pubId);
+  SHEET_ID=sheetId;localStorage.setItem('art_sheet_id',sheetId);
+  loadFromSheets();
 }
 function testConnection(){
-  if(!SHEET_ID){toast('Enter Sheet ID first','error');return;}
-  toast('Testing...','info');
-  fetchSheetCSV('Patient_Registry').then(r=>{if(r.length>0)toast('✅ Connected! '+r.length+' patient rows','success');else toast('Connected but no data','info');}).catch(()=>toast('❌ Connection failed','error'));
+  if(!PUB_ID&&!SHEET_ID){toast('Enter Published URL ID first','error');return;}
+  toast('Testing connection...','info');
+  fetchSheetCSV('Patient_Registry').then(r=>{if(r.length>0)toast('✅ Connected! '+r.length+' patient rows','success');else toast('Connected but Patient_Registry tab returned no data','info');}).catch(e=>toast('❌ '+e.message,'error'));
 }
 function setConnection(ok){
   document.getElementById('conn-dot').className='conn-dot'+(ok?'':' offline');
